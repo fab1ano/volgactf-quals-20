@@ -7,7 +7,7 @@ Category: pwn.
 
 Challenge file: `notepad`. `libc` was not given.
 
-Description: 
+Description:
 ```
 Notepad-- is the app to store your most private notes, with an extremely lightweight UI. Check it out!
 
@@ -125,7 +125,7 @@ notebooks[0].tab[65]   +----------------+
                        +----------------+
                        | tab[0].c_size  |
                        +----------------+
-                       | tab[0].content |---->... (malloc'd memory)
+                       | tab[0].content |-----> (malloc'd memory)
 notebooks[0].tab[66]   +----------------+
    |                   | ...            |
    +--------->   0x858 +----------------+
@@ -147,7 +147,7 @@ Note: Indices in user interaction are one-based, which is mapped to zero-based a
 In this writeup all indices are zero-based.
 
 The first notebook is now capable of accessing the contents of the subsequent notebooks.
-By adding a tab to `notebooks[3]` and listing all tabs of `notebooks[0]` we receive a heap address since 
+By adding a tab to `notebooks[3]` and listing all tabs of `notebooks[0]` we receive a heap address since
 the access to the name of `notebooks[0].tab[195]` results in the access of the `content` member of `notebooks[3].tab[0]`.
 
 The tab which was added to `notebooks[3]` in the previous step should have a content of length 8.
@@ -155,7 +155,7 @@ This makes the implementation of arbitrary read and write easier since this is t
 
 Arbitrary read and write can now be implemented by updating the name of `notebooks[0].tab[195]` with the target address.
 This overwrites the `content` pointer of `notebooks[3].tab[0]` with the desired address.
-By viewing (arbitrary read) or updating (arbitrary write) `notebooks[3].tab[0]` we can now read or write the target address. 
+By viewing (arbitrary read) or updating (arbitrary write) `notebooks[3].tab[0]` we can now read or write the target address.
 
 Given these primitives it goes straight forward to starting a shell.
 By first adding and then removing a couple of taps (at least 8) one can get a libc address on the heap, which can be leaked with the arbitrary read.
