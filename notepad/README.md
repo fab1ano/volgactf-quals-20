@@ -133,7 +133,7 @@ notebooks[0].tab[66]   +----------------+
 ```
 
 Going further, in `notebook[3]` this index points to the `content` member of the tabs.
-Therefore, we can first read that pointer in the `content` member to get a heap leak and then overwrite it (by updating the tap out of bounds) to get arbitrary read and write.
+Therefore, we can first read that pointer in the `content` member to get a heap leak and then overwrite it (by updating the tab out of bounds) to get arbitrary read and write.
 
 For the heap leak let's create four notebooks:
 ```
@@ -158,9 +158,9 @@ This overwrites the `content` pointer of `notebooks[3].tab[0]` with the desired 
 By viewing (arbitrary read) or updating (arbitrary write) `notebooks[3].tab[0]` we can now read or write the target address.
 
 Given these primitives it goes straight forward to starting a shell.
-By first adding and then removing a couple of taps (at least 8) one can get a libc address on the heap, which can be leaked with the arbitrary read.
+By first adding and then removing a couple of tabs (at least 8) one can get a libc address on the heap, which can be leaked with the arbitrary read.
 
-Since the version of libc is not given, one must fingerprint the entries of the `notepad`s got.
+Since the version of libc is not given, one must fingerprint the entries of the `notepad`s `.got`.
 From the libc address we can retrieve a pointer to the binary itself, which is located close to the libc address we leaked.
 
 Then one might overwrite the `__free_hook` with `system`, add a tab with `/bin/sh` as content and pop a shell by deleting the tab.
