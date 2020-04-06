@@ -158,10 +158,16 @@ This overwrites the `content` pointer of `notebooks[3].tab[0]` with the desired 
 By viewing (arbitrary read) or updating (arbitrary write) `notebooks[3].tab[0]` we can now read or write the target address.
 
 Given these primitives it goes straight forward to starting a shell.
-By first adding and then removing a couple of tabs (at least 8) one can get a libc address on the heap, which can be leaked with the arbitrary read.
+By first adding and then removing a couple of tabs one can get a libc address to the heap.
+These tabs must be large enough to be added to `unsorted_bin`, e.g. size `0x100`.
+Also, there must be at least 8 tabs removed such that the `tcache` is filled and at least one tab is stored in an `unsorted_bin`.
+Then the chunk holds a pointer to libc and we can leak said libc pointer with the arbitrary read.
 
-Since the version of libc is not given, one must fingerprint the entries of the `notepad`s `.got`.
-From the libc address we can retrieve a pointer to the binary itself, which is located close to the libc address we leaked.
+Since the version of libc is not given, one must fingerprint the entries of `notepad`s `.got`.
+From the libc address we can retrieve a pointer to the binary itself.
+For this purpose we use a pointer to `notepad`s `stdin` or `stdout` which is located in `libc`s `.got`.
+Since said pointer is located close to our libc leak, even with a different libc version it is likely that we are able to extract the address of `notepad`.
+Given the address of `notepad`, one can get the `.got` entries of `notepad` and identify `libc`.
 
 Then one might overwrite the `__free_hook` with `system`, add a tab with `/bin/sh` as content and pop a shell by deleting the tab.
 
